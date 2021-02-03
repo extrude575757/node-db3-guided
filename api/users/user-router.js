@@ -2,10 +2,11 @@ const express = require("express");
 
 const db = require("../../data/db-config.js");
 const User = require('./user-model.js');
+const UsersPo = require('./userPost-model')
 const router = express.Router();
 
 router.get('/:id/posts', (req, res) => {
-  User.getPosts(req.params.id)
+  UsersPo.getPosts(req.params.id)
     .then(posts => {
       res.json(posts)
     })
@@ -14,7 +15,16 @@ router.get('/:id/posts', (req, res) => {
     })
 })
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  try{
+    const users = await User.find()
+    res.json(users);
+  }catch(er){
+    console.log(er)
+    res.status(500).json({
+      message: 'failed 500 get / async',er
+    })
+  }
   db("users")
     .then(users => {
       res.json(users);
